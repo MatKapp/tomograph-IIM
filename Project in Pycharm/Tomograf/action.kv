@@ -1,0 +1,34 @@
+<Controller>:
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        BoxLayout:
+            orientation: 'horizontal'
+
+            Image:
+                id: first_image
+
+            Image:
+                id: second_image
+
+            Image:
+                id: third_image
+
+        BoxLayout:
+            orientation: 'horizontal'
+
+            Button:
+                id: first_button
+                text: "Load the image"
+                on_press: root.first_button_clicked()
+
+            Button:
+                id: second_button
+                text: "Process the image"
+                on_press: root.second_button_clicked()
+
+            Button:
+                id: third_button
+                text: "Recover the image"
+                on_press: root.third_button_clicked()

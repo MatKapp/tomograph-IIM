@@ -1,24 +1,43 @@
 import os
 import scipy
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
 import math
+import kivy
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
+
+kivy.require('1.9.1')
 
 from scipy import misc
 
 
-STEP = math.pi / 90
-RANGE = 0.2 * math.pi
-DETECTORS = 201
 
-STEPS = math.floor(math.pi / STEP)
-PATH = 'zdjecia'
-image = misc.imread(os.path.join(PATH, 'Shepp_logan.jpg'), flatten=1)
-image = scipy.misc.imresize(image, (len(image) // 5, len(image[0]) // 5))
-R = (len(image) ** 2 + len(image[0]) ** 2) ** 0.5
-HALF_DETECTORS = DETECTORS // 2
-WIDTH = len(image[0])-1
-HEIGHT = len(image)-1
+
+
+class Controller(BoxLayout):
+    def __init__(self):
+        super(Controller, self).__init__()
+
+    def first_button_clicked(self):
+        self.ids.first_image.source = os.path.join(PATH, 'Shepp_logan.jpg')
+        self.ids.first_image.reload()
+
+    def second_button_clicked(self):
+        self.ids.second_image.source = 'sinogram.jpg'
+        self.ids.second_image.reload()
+
+    def third_button_clicked(self):
+        self.ids.third_image.source = 'recovered.jpg'
+        self.ids.third_image.reload()
+
+
+class ActionApp(App):
+
+    def build(self):
+        return Controller()
 
 
 class SinogramExecutor:
@@ -114,10 +133,30 @@ def recover_image(sinogram):
     return recoveredImage
 
 if __name__ == '__main__':
-    sinogram = build_sinogram(image)
-    plt.imshow(tuple(sinogram), interpolation='nearest', cmap='gray')
-    plt.show()
+    STEP = math.pi / 90
+    RANGE = 0.2 * math.pi
+    DETECTORS = 201
 
+    STEPS = math.floor(math.pi / STEP)
+    PATH = 'zdjecia'
+    image = misc.imread(os.path.join(PATH, 'Shepp_logan.jpg'), flatten=1)
+    image = scipy.misc.imresize(image, (len(image) // 5, len(image[0]) // 5))
+    R = (len(image) ** 2 + len(image[0]) ** 2) ** 0.5
+    HALF_DETECTORS = DETECTORS // 2
+    WIDTH = len(image[0]) - 1
+    HEIGHT = len(image) - 1
+    myApp = ActionApp()
+    sinogram = build_sinogram(image)
+    misc.imsave("sinogram.jpg", sinogram)
     recoveredImage = recover_image(sinogram)
-    plt.imshow(tuple(recoveredImage), interpolation='nearest', cmap='gray')
-    plt.show()
+    misc.imsave("recovered.jpg", recoveredImage)
+    myApp.run()
+
+
+
+    # plt.imshow(tuple(sinogram), interpolation='nearest', cmap='gray')
+    # plt.show()
+    #
+    # recoveredImage = recover_image(sinogram)
+    # plt.imshow(tuple(recoveredImage), interpolation='nearest', cmap='gray')
+    # plt.show()
