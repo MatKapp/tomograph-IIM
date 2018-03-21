@@ -52,7 +52,6 @@ def bresenhamLine(startPoint, endPoint, executor):
     y0, x0 = startPoint
     y1, x1 = endPoint
     "Bresenham's line algorithm"
-    result = 0
     dx = abs(x1 - x0)
     dy = abs(y1 - y0)
     x, y = x0, y0
@@ -89,31 +88,36 @@ def compute_coordinates(phi):
     x = int(x + 0.5 * len(image[0]))
     return (y, x)
 
-
-if __name__ == '__main__':
+def build_sinogram(image):
     sinogram = []
     for i in range(STEPS):
         middle_angle = i * STEP
         projection = []
         for ray in range(-HALF_DETECTORS, HALF_DETECTORS, 1):
-            shift_angle = ray * RANGE / (2 * HALF_DETECTORS + 1)
+            shift_angle = ray * RANGE / DETECTORS
             start_point = compute_coordinates(middle_angle + shift_angle)
             end_point = compute_coordinates(middle_angle + math.pi - shift_angle)
             projection.append(bresenhamLine(start_point, end_point, SinogramExecutor(image)))
         sinogram.append(projection)
-    plt.figure(1)
-    plt.imshow(tuple(sinogram), interpolation='nearest', cmap='gray')
-    plt.show()
+    return sinogram
 
+def recover_image(sinogram):
     recoveredImage = [[0 for x in range(len(image[0]))] for y in range(len(image))]
     for i in range(STEPS):
         middle_angle = i * STEP
         for ray in range(-HALF_DETECTORS, HALF_DETECTORS, 1):
-            shift_angle = ray * RANGE / (2 * HALF_DETECTORS + 1)
+            shift_angle = ray * RANGE / DETECTORS
             start_point = compute_coordinates(middle_angle + shift_angle)
             end_point = compute_coordinates(middle_angle + math.pi - shift_angle)
             value = sinogram[i][ray + HALF_DETECTORS]
             recoveredImage = bresenhamLine(start_point, end_point, RecoveryExecutor(recoveredImage, value))
+    return recoveredImage
 
+if __name__ == '__main__':
+    sinogram = build_sinogram(image)
+    plt.imshow(tuple(sinogram), interpolation='nearest', cmap='gray')
+    plt.show()
+
+    recoveredImage = recover_image(sinogram)
     plt.imshow(tuple(recoveredImage), interpolation='nearest', cmap='gray')
     plt.show()
