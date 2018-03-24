@@ -1,5 +1,4 @@
 <Controller>:
-
     BoxLayout:
         orientation: 'vertical'
 
@@ -14,6 +13,42 @@
 
             Image:
                 id: third_image
+
+        BoxLayout:
+            orientation: 'horizontal'
+
+            BoxLayout:
+                orientation: 'vertical'
+
+                Label:
+                    text: 'Select the file to be processed:'
+
+                FileChooserListView:
+                    id: file_chooser
+
+            BoxLayout:
+                orientation: 'vertical'
+
+                Label:
+                    text: 'Detectors number:'
+
+                TextInput:
+                    id: detectors_number_input
+                    multiline: False
+
+                Label:
+                    text: 'Steps number:'
+
+                TextInput:
+                    id: steps_input
+                    multiline: False
+
+                Label:
+                    text: 'Detectors range:'
+
+                TextInput:
+                    id: detectors_range_input
+                    multiline: False
 
         BoxLayout:
             orientation: 'horizontal'
