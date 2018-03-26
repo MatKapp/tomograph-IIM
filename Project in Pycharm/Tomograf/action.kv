@@ -25,6 +25,7 @@
                 TextInput:
                     id: detectors_number_input
                     multiline: False
+                    text: "100"
 
                 Label:
                     text: 'Steps number:'
@@ -32,6 +33,7 @@
                 TextInput:
                     id: steps_input
                     multiline: False
+                    text: "50"
 
                 Label:
                     text: 'Detectors range:'
@@ -39,12 +41,7 @@
                 TextInput:
                     id: detectors_range_input
                     multiline: False
-
-                Label:
-                    text: 'Step by step processing'
-
-                CheckBox:
-                    id: incremental_check_box
+                    text: "90"
 
 
         BoxLayout:
@@ -64,8 +61,17 @@
         BoxLayout:
             orientation: 'horizontal'
 
+            Button:
+                id: first_button
+                text: "Load the image"
+                on_press: root.first_button_clicked()
+
+
             BoxLayout:
                 orientation: 'vertical'
+
+                Label:
+                    text: "Slider to choose the processing step."
 
                 Slider:
                     id: slider
@@ -74,14 +80,9 @@
                     on_touch_up: root.slider_touched_up()
 
                 Button:
-                    id: first_button
-                    text: "Load the image"
-                    on_press: root.first_button_clicked()
-
-            Button:
-                id: second_button
-                text: "Process the image"
-                on_press: root.second_button_clicked()
+                    id: second_button
+                    text: "Process the image"
+                    on_press: root.second_button_clicked()
 
             Button:
                 id: third_button

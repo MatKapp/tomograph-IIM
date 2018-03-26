@@ -1,16 +1,12 @@
-import os
 import scipy
 import numpy as np
 import math
 import kivy
 import cv2
-from copy import deepcopy
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
-
 kivy.require('1.9.1')
-
 from scipy import misc
 
 
@@ -23,31 +19,35 @@ class Controller(BoxLayout):
 
     def first_button_clicked(self):
         global image
-        self.ids.first_image.source = self.ids.file_chooser.selection[0]
-        self.ids.first_image.reload()
-        image = misc.imread(self.ids.file_chooser.selection[0], flatten=1)
-        image = scipy.misc.imresize(image, (len(image) // 5, len(image[0]) // 5))
+        if len(self.ids.file_chooser.selection) != 0:
+            self.ids.first_image.source = self.ids.file_chooser.selection[0]
+            self.ids.first_image.reload()
+            image = misc.imread(self.ids.file_chooser.selection[0], flatten=1)
+            image = scipy.misc.imresize(image, (len(image) // 5, len(image[0]) // 5))
 
     def second_button_clicked(self):
         global image, sinogram, RANGE, STEPS, R, HALF_DETECTORS, WIDTH, HEIGHT, DETECTORS, STEP
-        RANGE = float(self.ids.detectors_range_input.text)*math.pi/180
-        DETECTORS = int(self.ids.detectors_number_input.text)
-        STEPS = int(self.ids.steps_input.text)
-        STEP = math.pi / STEPS
-        R = (len(image) ** 2 + len(image[0]) ** 2) ** 0.5
-        HALF_DETECTORS = DETECTORS // 2
-        WIDTH = len(image[0]) - 1
-        HEIGHT = len(image) - 1
-        sinogram = build_sinogram(image, self)
-        for i in range(1,SLIDER_MAX+1):
-            misc.imsave("sinogram_{0}.jpg".format(i), sinogram[:int(STEPS*i/SLIDER_MAX)])
-        self.ids.second_image.source = 'sinogram_{0}.jpg'.format(SLIDER_MAX)
-        self.ids.second_image.reload()
+        if len(image) != 0:
+            detectors_range = int(self.ids.detectors_range_input.text) if self.ids.detectors_range_input.text != "" else 90
+            RANGE = float(detectors_range)*math.pi/180
+            DETECTORS = int(self.ids.detectors_number_input.text) if self.ids.detectors_number_input.text != "" else 100
+            STEPS = int(self.ids.steps_input.text) if self.ids.steps_input.text != "" else 100
+            STEP = math.pi / STEPS
+            R = (len(image) ** 2 + len(image[0]) ** 2) ** 0.5
+            HALF_DETECTORS = DETECTORS // 2
+            WIDTH = len(image[0]) - 1
+            HEIGHT = len(image) - 1
+            sinogram = build_sinogram(image, self)
+            for i in range(1,SLIDER_MAX+1):
+                misc.imsave("sinogram_{0}.jpg".format(i), sinogram[:int(STEPS*i/SLIDER_MAX)])
+            self.ids.second_image.source = 'sinogram_{0}.jpg'.format(SLIDER_MAX)
+            self.ids.second_image.reload()
 
     def third_button_clicked(self):
-        recoveredImage = recover_image(sinogram)
-        self.ids.third_image.source = "recovered_image_{0}.jpg".format(SLIDER_MAX)
-        self.ids.third_image.reload()
+        if len(sinogram) != 0:
+            recoveredImage = recover_image(sinogram)
+            self.ids.third_image.source = "recovered_image_{0}.jpg".format(SLIDER_MAX)
+            self.ids.third_image.reload()
 
     def slider_touched_up(self):
         value = self.ids.slider.value
@@ -145,10 +145,6 @@ def build_sinogram(image, self):
             end_point = compute_coordinates(middle_angle + math.pi - shift_angle)
             projection.append(bresenhamLine(start_point, end_point, SinogramExecutor(image)))
         sinogram.append(projection)
-        # if i % STEPS/15:
-        #     misc.imsave("sinogram.jpg", sinogram)
-        #     self.ids.second_image.source = 'sinogram.jpg'
-        #     self.ids.second_image.reload()
     return sinogram
 
 def recover_image(sinogram):
@@ -163,15 +159,11 @@ def recover_image(sinogram):
                 end_point = compute_coordinates(middle_angle + math.pi - shift_angle)
                 value = sinogram[i][ray + HALF_DETECTORS]
                 recoveredImage = bresenhamLine(start_point, end_point, RecoveryExecutor(recoveredImage, value))
-
-        # filtered_image = None
-        # filtered_image = cv2.bilateralFilter(np.asarray(deepcopy(recoveredImage)), 15, 80, 80)
         misc.imsave("recovered_image_{0}.jpg".format(z+1), recoveredImage)
     return recoveredImage
 
 
 def filtering(image):
-    #return image
     return cv2.blur(np.asarray(image), (5, 5)) #cv2.filter2D(image, -1, kernel)
 
 if __name__ == '__main__':
