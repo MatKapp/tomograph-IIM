@@ -46,13 +46,21 @@ class Controller(BoxLayout):
     def third_button_clicked(self):
         if len(sinogram) != 0:
             recoveredImage = recover_image(sinogram)
+            if len(image) != 0 and len(recoveredImage) != 0:
+                squared_error = mean_squared_error(image, recoveredImage)
+                self.ids.mean_squared_error_value.text = str(squared_error)
             self.ids.third_image.source = "recovered_image_{0}.jpg".format(SLIDER_MAX)
             self.ids.third_image.reload()
 
     def slider_touched_up(self):
+        global image
         value = self.ids.slider.value
         self.ids.second_image.source = "sinogram_{0}.jpg".format(value)
         self.ids.third_image.source = "recovered_image_{0}.jpg".format(value)
+        recovered_image = misc.imread("recovered_image_{0}.jpg".format(value), flatten=1)
+        if len(image) != 0:
+            squared_error = mean_squared_error(image, recovered_image)
+            self.ids.mean_squared_error_value.text = str(squared_error)
         self.ids.second_image.reload()
         self.ids.third_image.reload()
 
@@ -165,6 +173,19 @@ def recover_image(sinogram):
 
 def filtering(image):
     return cv2.blur(np.asarray(image), (5, 5)) #cv2.filter2D(image, -1, kernel)
+
+def mean_squared_error(source, recovered):
+    squaredDifference = 0
+    if len(source) != len(recovered) or len(source[0]) != len(recovered[0]):
+        return 0
+    for row in range(len(source)):
+        for column in range(len(source[0])):
+            squaredDifference += math.pow(source[row][column] - recovered[row][column], 2)
+    numberOfElements = len(image) * len(image[0])
+    return math.sqrt(squaredDifference/numberOfElements)
+
+
+
 
 if __name__ == '__main__':
 

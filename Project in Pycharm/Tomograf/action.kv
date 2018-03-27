@@ -49,13 +49,18 @@
 
             Image:
                 id: first_image
+                allow_stretch: True
+                keep_ratio: False
 
             Image:
                 id: second_image
+                allow_stretch: True
+                keep_ratio: False
 
             Image:
                 id: third_image
-
+                allow_stretch: True
+                keep_ratio: False
 
 
         BoxLayout:
@@ -84,7 +89,18 @@
                     text: "Process the image"
                     on_press: root.second_button_clicked()
 
-            Button:
-                id: third_button
-                text: "Recover the image"
-                on_press: root.third_button_clicked()
+            BoxLayout:
+                orientation: 'vertical'
+
+                Label:
+                    text: "Mean Squared Error value:"
+
+                Label:
+                    text: "Mean Squared Error Value"
+                    id: mean_squared_error_value
+
+                Button:
+                    id: third_button
+                    text: "Recover the image"
+                    on_press: root.third_button_clicked()
+
